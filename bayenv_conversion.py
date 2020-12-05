@@ -12,6 +12,15 @@ for i in range(len(pops)):
     data.append(frame)
 
 def init_proc_file(data):
+	print(len(data))
+	if data['filename'].iloc[1] == "CAP":
+		data=data[data["nInd"]==19]
+	elif data['filename'].iloc[1] == "FOG":
+                data=data[data["nInd"]==18]
+	else:
+		data=data[data["nInd"]==20]
+	print(len(data))
+	data=data.iloc[::100, :]
 	data['chromo'] = data['chromo'].apply(str)
 	data['position'] = data['position'].apply(str)
 	data['pos'] = data[['chromo', 'position']].apply(lambda x: ''.join(x), axis=1)
@@ -20,8 +29,10 @@ def init_proc_file(data):
 	df["al_count"] = df.al_count.round().astype(int)
 	df.drop(df[df['al_count'] < 1].index, inplace = True)
 	df["al_count2"] = df["nInd"] - df["al_count"]
+	df = df.reset_index()
 	df = df[["pos","filename", "al_count", "al_count2"]]
-	pop = df["filename"][2]
+	print(len(df))
+	pop = df['filename'].iloc[1]
 	df = df.rename(columns={"al_count": "al_count"+pop, "al_count2": "al_count2"+pop})
 	df = df.drop(['filename'], axis=1)
 	return df
@@ -63,6 +74,6 @@ final_df["KIB"] = final_df.KIB.round().astype(int)
 final_df["CAP"] = final_df.CAP.round().astype(int)
 final_df["FOG"] = final_df.FOG.round().astype(int)
 
-# final_df = final_df.drop(['pos'], axis=1)
+#final_df = final_df.drop(['pos'], axis=1)
 
-final_df.to_csv('/users/c/p/cpetak/WGS/angsd_new_noout/snpsfile_withpos', index=False,sep="\t",header=False)
+final_df.to_csv('/users/c/p/cpetak/WGS/angsd_new_noout/snpsfile_100_pos', index=False,sep="\t",header=False)
