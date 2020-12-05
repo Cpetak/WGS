@@ -161,6 +161,10 @@ ggplot(all_ph, aes(x=Date, y=pH, fill=Location)) +
   geom_boxplot()
 
 tgc <- summarySE(all_ph, measurevar="Temp", groupvars=c("Location"))
+temp_means <- tgc["Temp"]
+tgc <- summarySE(all_ph, measurevar="pH", groupvars=c("Location"))
+ph_means <- tgc["pH"]
+
 ggplot(tgc, aes(x=Location, y=Temp)) + 
   geom_bar(position=position_dodge(), stat="identity") +
   geom_errorbar(aes(ymin=Temp-ci, ymax=Temp+ci),
@@ -168,7 +172,6 @@ ggplot(tgc, aes(x=Location, y=Temp)) +
                 position=position_dodge(.9)) +
   coord_cartesian(ylim=c(9,13)) +
   ylab("Mean temperature")
-
 
 res.aov <- aov(Temp ~ Location, data = all_ph)
 # Summary of the analysis
@@ -227,3 +230,35 @@ min(Fy$pH)
 mean(Fy$pH)
 Sh <- subset(phdata, Location == "D/Cape_Blanco")
 sd(Sh$pH)
+
+ph_freq <- c(0.1780976, 0.07188418, 0.003375068, 0.05026657, 0,0.00729927 )
+temp_var <- c(1.713702,1.344381, 1.205099, 1.549824,1.210292 , 1.098031)
+ph_mean <- c(7.983623,8.009176,8.022380,7.996050,8.177942,8.076118)
+temp_mean <- c(10.35057,10.17522,10.15551,11.41514,12.67584,12.47098)
+
+final <- as.data.frame(ph_freq)
+final["temp_var"] <- temp_var
+final["ph_mean"] <- ph_mean
+final["temp_mean"] <- temp_mean
+df.scaled <- as.data.frame(scale(final))
+locs <- c("Fogarty Creek","Cape Blanco", "Kibesilah Hill", "Bodega Bay", "Terrace Point", "Lompoc Landing")
+df.scaled["locs"] <- locs
+
+level_order <- c("Fogarty Creek","Cape Blanco", "Kibesilah Hill", "Bodega Bay", "Terrace Point", "Lompoc Landing")
+
+ggplot(df.scaled, aes(x= factor(locs, level = level_order),group = 1)) + 
+  geom_line(aes(y = temp_var,color = "darkred")) +
+  geom_point(aes(y = temp_var),colour = 'darkgrey', size = 2) +
+  geom_line(aes(y = temp_mean,color="steelblue")) +
+  geom_point(aes(y = temp_mean),colour = 'darkgrey', size = 2) +
+  geom_line(aes(y = ph_mean,color="orange")) +
+  geom_point(aes(y = ph_mean),colour = 'darkgrey', size = 2) +
+  geom_line(aes(y = ph_freq,color="darkgreen")) +
+  geom_point(aes(y = ph_freq),colour = 'darkgrey', size = 2)+
+  scale_color_identity(name = "Environmental variable",
+                       breaks = c("darkgreen", "darkred", "orange","steelblue"),
+                       labels = c("Freq. pH < 7.8", "Temp var", "pH mean", "Temp mean"), guide = "legend")+
+  xlab("Location")+
+  ylab("Scaled value")+
+  theme_bw()
+  
