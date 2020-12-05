@@ -14,3 +14,6 @@ Estimating covarience matrix and Bayenv factors -> [Running Bayenv](https://gith
 
 ## Step 5
 Generating dataframe with Bayenv factor, number of neighbors, expression level and SNP number -> [Feature engineering](https://github.com/Cpetak/WGS/blob/main/get_gene_from_snp.ipynb)
+
+## Step 6
+Exploring and modeling variables -> [Playing with variables](https://github.com/Cpetak/WGS/blob/main/playing_with_variables-new.ipynb)
