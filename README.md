@@ -5,3 +5,6 @@ From raw sequence data to SNPs -> [Sequence processing](https://github.com/Cpeta
 
 ## Step 2
 From temporal pH and temperature data to scaled mean and variability -> [Environmental data processing](https://github.com/Cpetak/WGS/blob/main/env_data_processing.R)
+
+## Step 3
+Converting the output of ANGSD with the SNPs into the format Bayenv expects -> [Converting for Bayenv](https://github.com/Cpetak/WGS/blob/main/bayenv_conversion.py)
