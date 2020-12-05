@@ -8,3 +8,6 @@ From temporal pH and temperature data to scaled mean and variability -> [Environ
 
 ## Step 3
 Converting the output of ANGSD with the SNPs into the format Bayenv expects -> [Converting for Bayenv](https://github.com/Cpetak/WGS/blob/main/bayenv_conversion.py)
+
+## Step 4
+Estimating covarience matrix and Bayenv factors -> [Running Bayenv](https://github.com/Cpetak/WGS/blob/main/Running_bayenv.md)
