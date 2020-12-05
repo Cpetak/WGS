@@ -11,3 +11,6 @@ Converting the output of ANGSD with the SNPs into the format Bayenv expects -> [
 
 ## Step 4
 Estimating covarience matrix and Bayenv factors -> [Running Bayenv](https://github.com/Cpetak/WGS/blob/main/Running_bayenv.md)
+
+## Step 5
+Generating dataframe with Bayenv factor, number of neighbors, expression level and SNP number -> 
