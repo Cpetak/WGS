@@ -178,6 +178,23 @@ res.aov <- aov(Temp ~ Location, data = all_ph)
 summary(res.aov)
 TukeyHSD(res.aov)
 
+library(Rmisc)
+
+terrace <- subset(phdata, Date < 20130000& Date > 20120000)
+terrace <- subset(terrace, Location == "B/Strawberry_Hill" | Location =="E/Cape_Mendocino") 
+terrace$Date <- as.character(terrace$Date)
+df4=summarySE(terrace, measurevar="pH", groupvars=c("Location","Date"))
+ave <- terrace %>% 
+  group_by(Date, Location) %>% 
+    summarise(average = mean(pH))
+p <-ggplot(data=terrace, aes(x=Date, y=pH, group=Location)) +
+  geom_line(aes(color=Location)) + theme(panel.background = element_blank()) + scale_color_manual(name="Env", 
+                       labels = c("Strawberry Hill", 
+                                  "Cape Mendocino"), 
+                       values = c("B/Strawberry_Hill"="red", 
+                                  "E/Cape_Mendocino"="blue"))
+p + theme(axis.text.x = element_blank()) + theme(legend.text=element_text(size=10))
+
 #geom_ribbon(aes(ymax = pH + sd, ymin = pH - sd, fill= Location))
 test <- all_ph %>% group_by(Location) %>% group_map(~ sum(.x$pH < 7.8)/length(.x$pH))
 plot(seq(length(test)),test)
@@ -244,3 +261,4 @@ ggplot(df.scaled, aes(x= factor(locs, level = level_order),group = 1)) +
   xlab("Location")+
   ylab("Scaled value")+
   theme_bw()
+  
