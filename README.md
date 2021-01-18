@@ -58,3 +58,5 @@ Exploring and modeling variables -> [Playing with variables](https://github.com/
 **SPU_LOC_conv.txt** -> Downloaded from String DB, conversion between the old SPU and the new LOC tags of urchin genes.
 
 **string-db-mining.ipynb** -> Scraping the String DB. Wasn't used in the end, instead whole network file was downloaded and processed.
+
+**DS_final_project.pdf** -> Document summarising all steps, my Data Science I final paper.
