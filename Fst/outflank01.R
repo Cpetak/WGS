@@ -3,8 +3,8 @@ library(OutFLANK)
 library(vcfR)
 
 #inputs I need to provide. example files were downloaded from github.
-vcf <- read.vcfR("sim1a.vcf.gz", verbose=FALSE)
-ind <- read.table("Pop.txt", header=TRUE) #only ind$pop is used
+vcf <- read.vcfR("first.vcf", verbose=FALSE)
+ind <- read.table("mypops.txt", header=TRUE) #only ind$pop is used
 
 #Convert VCF format to SNP data format
 convertVCFtoCount3 <- function(string){
@@ -27,39 +27,56 @@ k <- max(ind$pop)
 
 FstDataFrame <- MakeDiploidFSTMat(SNPdata,locinames,ind$pop)
 
-#this is how is should look like
-plot(FstDataFrame$FST, FstDataFrame$FSTNoCorr, 
+#SAVE TO FILE BEFORE PROCEEDING
+write.csv(FstDataFrame, file = "my_example_data.csv")
+#uncomment following if needed
+#FstDataFrame <- read.csv(file = 'my_example_data.csv', header=TRUE,row.names=1)
+
+#subset data for plotting -otherwise too many points crush my computer
+reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),100),]
+
+#should be on a line
+plot(reduced_df$FST, reduced_df$FSTNoCorr, 
      xlim=c(-0.01,0.3), ylim=c(-0.01,0.3),
      pch=20)
 abline(0,1)
 
 #example of how a SNP with missing data would look like that should be removed
 #shown with star on plot
-SNPdata_missing <- SNPdata
-missing <- sample(1:nrow(SNPdata_missing), 500, replace=FALSE)
-SNPdata_missing[missing,1] <- 9
-FstDataFrame_missing <- MakeDiploidFSTMat(SNPdata_missing,locinames,ind$pop)
-plot(FstDataFrame_missing$FST, FstDataFrame_missing$FSTNoCorr, xlim=c(-0.01,0.3), ylim=c(-0.01,0.3), pch=20)
-points(FstDataFrame_missing$FST[1], FstDataFrame_missing$FSTNoCorr[1], col="blue", pch=8, cex=1.3)
-abline(0,1)
+#SNPdata_missing <- SNPdata
+#missing <- sample(1:nrow(SNPdata_missing), 500, replace=FALSE)
+#SNPdata_missing[missing,1] <- 9
+#FstDataFrame_missing <- MakeDiploidFSTMat(SNPdata_missing,locinames,ind$pop)
+#plot(FstDataFrame_missing$FST, FstDataFrame_missing$FSTNoCorr, xlim=c(-0.01,0.3), ylim=c(-0.01,0.3), pch=20)
+#points(FstDataFrame_missing$FST[1], FstDataFrame_missing$FSTNoCorr[1], col="blue", pch=8, cex=1.3)
+#abline(0,1)
 
 
-plot(FstDataFrame$He, FstDataFrame$FSTNoCorr, pch=20, col="grey") #outliers
+plot(reduced_df$He, reduced_df$FSTNoCorr, pch=20, col="grey") #outliers
 # Note the large FST values for loci with low heterozygosity (He < 0.1)
 
 #demonstration of how we need to remove low heterozygocity loci 
-hist(FstDataFrame$FSTNoCorr, breaks=seq(0,0.3, by=0.001))
-hist(FstDataFrame$FSTNoCorr[FstDataFrame$He>0.05], breaks=seq(0,0.3, by=0.001))
+hist(reduced_df$FSTNoCorr, breaks=50)
+hist(reduced_df$FSTNoCorr[reduced_df$He>0.05], breaks=50)
 #this is how the distribution should look like instead:
-hist(FstDataFrame$FSTNoCorr[FstDataFrame$He>0.1], breaks=seq(0,0.3, by=0.001))
+#hist(FstDataFrame$FSTNoCorr[FstDataFrame$He>0.1], breaks=seq(0,0.3, by=0.001))
 
 #FstDataFrame_corr <- FstDataFrame[FstDataFrame$He>0.1,] don't need this as it's part of next step
 #By default, OutFLANK removes from consideration all loci with expected heterozygosity less than 10%.
 
+#check if there is any NA. They come to be when everyone in the vcf if heterozygous to a location.
+temp <- FstDataFrame[rowSums(is.na(FstDataFrame))>0,] #967
+#len of temp is = number of rows where everyone is heterozygous to the locus
+FstDataFrame2 <- na.omit(FstDataFrame)
+FstDataFrame3 <- FstDataFrame2[!(FstDataFrame2$FST==0),] #this and the next line were written to deal with a bug but in the end adjusting the righttrimfraction was the solution so these might not be useful
+row.names(FstDataFrame3) <- (1:nrow(FstDataFrame3))
+
+k=3
+
 #running OutFlank
-out1 <- OutFLANK(FstDataFrame, NumberOfSamples=k) #see Rstudio "help" for options to this function
+out1 <- OutFLANK(FstDataFrame3, NumberOfSamples=k,RightTrimFraction = 0.01) #see Rstudio "help" for options to this function
 OutFLANKResultsPlotter(out1, withOutliers = TRUE,
-                       NoCorr = TRUE, Hmin = 0.1, binwidth = 0.001, Zoom =
+                       NoCorr = TRUE, Hmin = 0.1, binwidth = 0.01, Zoom =
                          FALSE, RightZoomFraction = 0.05, titletext = NULL) #see Rstudio "help" for options to this function
 #this is a good fit. but if not>
 #tweak qthreshold, RightTrimFraction
