@@ -32,16 +32,18 @@ FstDataFrame <- MakeDiploidFSTMat(SNPdata,locinames,ind$pop)
 #SAVE TO FILE BEFORE PROCEEDING
 write.csv(FstDataFrame, file = "my_example_data.csv")
 #uncomment following if needed
-FstDataFrame <- read.csv(file = 'combined.csv', header=TRUE,row.names=1)
+FstDataFrame <- read.csv(file = 'my_data.csv', header=TRUE,row.names=1)
 
 #subset data for plotting -otherwise too many points crush my computer
-reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),10),]
+reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),100000),]
 
 #should be on a line
+pdf("line.pdf")
 plot(reduced_df$FST, reduced_df$FSTNoCorr, 
      xlim=c(-0.01,0.3), ylim=c(-0.01,0.3),
      pch=20)
 abline(0,1)
+dev.off()
 
 #example of how a SNP with missing data would look like that should be removed
 #shown with star on plot
@@ -53,15 +55,18 @@ abline(0,1)
 #points(FstDataFrame_missing$FST[1], FstDataFrame_missing$FSTNoCorr[1], col="blue", pch=8, cex=1.3)
 #abline(0,1)
 
-
+pdf("dots.pdf")
 plot(reduced_df$He, reduced_df$FSTNoCorr, pch=20, col="grey") #outliers
 # Note the large FST values for loci with low heterozygosity (He < 0.1)
+dev.off()
 
+pdf("hist.pdf")
 #demonstration of how we need to remove low heterozygocity loci 
-hist(reduced_df$FSTNoCorr, breaks=50)
+#hist(reduced_df$FSTNoCorr, breaks=50)
 hist(reduced_df$FSTNoCorr[reduced_df$He>0.05], breaks=50)
 #this is how the distribution should look like instead:
 #hist(FstDataFrame$FSTNoCorr[FstDataFrame$He>0.1], breaks=seq(0,0.3, by=0.001))
+dev.off()
 
 #FstDataFrame_corr <- FstDataFrame[FstDataFrame$He>0.1,] don't need this as it's part of next step
 #By default, OutFLANK removes from consideration all loci with expected heterozygosity less than 10%.
@@ -73,7 +78,7 @@ temp <- FstDataFrame[rowSums(is.na(FstDataFrame))>0,] #967
 #FstDataFrame3 <- FstDataFrame2[!(FstDataFrame2$FST==0),] #this and the next line were written to deal with a bug but in the end adjusting the righttrimfraction was the solution so these might not be useful
 #row.names(FstDataFrame3) <- (1:nrow(FstDataFrame3))
 
-k=3
+k=7
 
 #running OutFlank
 out1 <- OutFLANK(FstDataFrame, NumberOfSamples=k)#RightTrimFraction = 0.01) #see Rstudio "help" for options to this function
@@ -94,6 +99,8 @@ points(outlier$results$He[outlier$results$qvalues<0.01], outlier$results$FST[out
 top_candidates <- outlier$results$qvalues<0.01 & outlier$results$He>0.1
 topcan <- outlier$results[top_candidates,]
 topcan[order(topcan$LocusName),]
+
+write.csv(topcan, file = "top_fst.csv")
 
 plot(vcf@fix[,"POS"], outlier$results$FST, 
      col=grey((as.numeric(vcf@fix[,"CHROM"])%%2+1)/3),
