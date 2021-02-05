@@ -1,3 +1,5 @@
+#for i in $(ls); do sed '1d' $i > ${i}_fixed; done
+#cat *csv_fixed > combined.csv
 #example of how to use outflank. copied from https://rpubs.com/lotterhos/outflank
 library(OutFLANK)
 library(vcfR)
@@ -30,10 +32,10 @@ FstDataFrame <- MakeDiploidFSTMat(SNPdata,locinames,ind$pop)
 #SAVE TO FILE BEFORE PROCEEDING
 write.csv(FstDataFrame, file = "my_example_data.csv")
 #uncomment following if needed
-#FstDataFrame <- read.csv(file = 'my_example_data.csv', header=TRUE,row.names=1)
+FstDataFrame <- read.csv(file = 'combined.csv', header=TRUE,row.names=1)
 
 #subset data for plotting -otherwise too many points crush my computer
-reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),100),]
+reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),10),]
 
 #should be on a line
 plot(reduced_df$FST, reduced_df$FSTNoCorr, 
@@ -67,14 +69,14 @@ hist(reduced_df$FSTNoCorr[reduced_df$He>0.05], breaks=50)
 #check if there is any NA. They come to be when everyone in the vcf if heterozygous to a location.
 temp <- FstDataFrame[rowSums(is.na(FstDataFrame))>0,] #967
 #len of temp is = number of rows where everyone is heterozygous to the locus
-FstDataFrame2 <- na.omit(FstDataFrame)
-FstDataFrame3 <- FstDataFrame2[!(FstDataFrame2$FST==0),] #this and the next line were written to deal with a bug but in the end adjusting the righttrimfraction was the solution so these might not be useful
-row.names(FstDataFrame3) <- (1:nrow(FstDataFrame3))
+#FstDataFrame2 <- na.omit(FstDataFrame)
+#FstDataFrame3 <- FstDataFrame2[!(FstDataFrame2$FST==0),] #this and the next line were written to deal with a bug but in the end adjusting the righttrimfraction was the solution so these might not be useful
+#row.names(FstDataFrame3) <- (1:nrow(FstDataFrame3))
 
 k=3
 
 #running OutFlank
-out1 <- OutFLANK(FstDataFrame3, NumberOfSamples=k,RightTrimFraction = 0.01) #see Rstudio "help" for options to this function
+out1 <- OutFLANK(FstDataFrame, NumberOfSamples=k)#RightTrimFraction = 0.01) #see Rstudio "help" for options to this function
 OutFLANKResultsPlotter(out1, withOutliers = TRUE,
                        NoCorr = TRUE, Hmin = 0.1, binwidth = 0.01, Zoom =
                          FALSE, RightZoomFraction = 0.05, titletext = NULL) #see Rstudio "help" for options to this function
