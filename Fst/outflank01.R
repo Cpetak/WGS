@@ -5,8 +5,8 @@ library(OutFLANK)
 library(vcfR)
 
 #inputs I need to provide. example files were downloaded from github.
-vcf <- read.vcfR("first.vcf", verbose=FALSE)
-ind <- read.table("mypops.txt", header=TRUE) #only ind$pop is used
+vcf <- read.vcfR("sim1a.vcf", verbose=FALSE)
+ind <- read.table("Pop.txt", header=TRUE) #only ind$pop is used
 
 #Convert VCF format to SNP data format
 convertVCFtoCount3 <- function(string){
@@ -24,8 +24,13 @@ system.time(gen_table <- matrix(convertVCFtoCount3(all.vcf.gen), ncol=ncol(all.v
 locinames <- paste(vcf@fix[,"CHROM"], vcf@fix[,"POS"], sep="_")
 
 SNPdata <- t(gen_table)
+temp <- SNPdata[rowSums(is.na(SNPdata))>0,]
+length(temp)
+
 
 k <- max(ind$pop)
+
+SNPdata[is.na(SNPdata)] <- 9
 
 FstDataFrame <- MakeDiploidFSTMat(SNPdata,locinames,ind$pop)
 
