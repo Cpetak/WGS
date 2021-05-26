@@ -30,10 +30,48 @@ ref="/users/c/p/cpetak/WGS/reference_genome/GCF_000002235.5_Spur_5.0_genomic.fna
 
 
 ```
-### Creating an individual file for each SNP
+### bcf to vcf
 ```
-mkdir temp
-cd temp
+bcftools view all_pop_angsd.bcf > all_pop_angsd.vcf
+```
 
-split -a 10 -l 2 $SNPFILE snp_batch
+### adding GT and removing other information from vcf file
+```
+vcfglxgt all_pop_angsd.vcf > fixed_all_pop_angsd.vcf
+bcftools annotate -x FORMAT fixed_all_pop_angsd.vcf > fixed_all_pop_angsd_onlyGT.vcf
+```
+### using OutFlank to get per-site Fst
+
+```
+
+library(OutFLANK)
+library(vcfR)
+
+#inputs I need to provide. example files were downloaded from github.
+vcf <- read.vcfR("fixed_all_pop_angsd_onlyGT.vcf", verbose=FALSE)
+ind <- read.table("my_pops.txt", header=TRUE) #only ind$pop is used
+
+#Convert VCF format to SNP data format
+convertVCFtoCount3 <- function(string){
+  # This function assumes 0 for reference
+  # and 1 for alternate allele
+  a <- as.numeric(unlist(strsplit(string, split = c("[|///]"))))
+  odd = seq(1, length(a), by=2)
+  a[odd] + a[odd+1]
+}
+
+#setting up
+all.vcf.gen <- vcf@gt[,-1]
+system.time(gen_table <- matrix(convertVCFtoCount3(all.vcf.gen), ncol=ncol(all.vcf.gen)))
+
+locinames <- paste(vcf@fix[,"CHROM"], vcf@fix[,"POS"], sep="_")
+
+SNPdata <- t(gen_table)
+
+k <- max(ind$pop)
+
+FstDataFrame <- MakeDiploidFSTMat(SNPdata,locinames,ind$pop)
+
+#SAVE TO FILE BEFORE PROCEEDING
+write.csv(FstDataFrame, file = "all_fst_data.csv")
 ```
