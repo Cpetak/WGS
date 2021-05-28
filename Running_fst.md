@@ -49,6 +49,8 @@ Keep only GT information
 ```
 awk -v FS="\t" -v OFS="\t" '{for(i=9;i<=NF;i++) {split($i, gt, ":"); $i=gt[1]} print}' fixed_all_pop_angsd_copy.vcf > fixed_all_pop_angsd_copy_onlyGT.vcf
 ```
+Separate header a split rest for parallelisation
+these are the files I copied that I am starting over with. ATTENTION fixed_all_pop_angsd.vcf and fixed_all_pop_angsd_onlyGT.vcf are the files prior the the above 2 steps!!!
 ```
 head -916 fixed_all_pop_angsd_copy_onlyGT.vcf > vcf_head.vcf
 cat fixed_all_pop_angsd_copy_onlyGT.vcf | grep -v "#" > vcf_tail.vcf
