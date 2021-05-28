@@ -111,7 +111,8 @@ do
 	echo -e "write.csv(FstDataFrame, file = \"${i}data.csv\")" >> $script_name
 done
 ```
--> example output: topped_xdk.vcfscript.R
+-> example output: topped_xaa.vcfscript.R
+Pop.txt is a text file where each line contains the population number, here it is just 20 1s, 20 2s, etc.
 ```
 ls | grep "vcfscript" > scripts.txt
 
@@ -131,4 +132,14 @@ while read line ; do
 done < $1
 
 ```
--> example output
+-> example output: topped_xaa.vcfdata.csv
+Combining small csvs together after taking out header:
+```
+mkdir csvs
+mv *data.csv csvs
+cd csvs
+for i in $(ls); do sed '1d' $i > ${i}_fixed; done
+cat *csv_fixed > combined.csv
+cut -f 2-10 -d , combined.csv | nl -w 1 -p -s , > fixed_combined.csv #reindexing csv
+vim fixed_combined.csv -> insert as first line: "","LocusName","He","FST","T1","T2","FSTNoCorr","T1NoCorr","T2NoCorr","meanAlleleFreq" 
+```
