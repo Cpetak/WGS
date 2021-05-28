@@ -143,3 +143,37 @@ cat *csv_fixed > combined.csv
 cut -f 2-10 -d , combined.csv | nl -w 1 -p -s , > fixed_combined.csv #reindexing csv
 vim fixed_combined.csv -> insert as first line: "","LocusName","He","FST","T1","T2","FSTNoCorr","T1NoCorr","T2NoCorr","meanAlleleFreq" 
 ```
+## using OutFlank to plot Fst distribution
+Inside new_results/partial_vcfs/csvs
+
+```
+library(OutFLANK)
+library(vcfR)
+
+FstDataFrame <- read.csv(file = 'fixed_combined.csv', header=TRUE,row.names=1)
+
+print("read file")
+
+reduced_df<-FstDataFrame[seq(1,nrow(FstDataFrame),1000),] #print every 1000th datapoint, otherwise the output is huge
+
+print("reduced file")
+
+pdf("line.pdf")
+plot(reduced_df$FST, reduced_df$FSTNoCorr, xlim=c(-0.01,0.3), ylim=c(-0.01,0.3), pch=20)
+abline(0,1)
+dev.off()
+
+print("first plot finished")
+
+pdf("dots.pdf")
+plot(reduced_df$He, reduced_df$FSTNoCorr, pch=20, col="grey")
+dev.off()
+
+print("second plot finished")
+
+pdf("hist.pdf")
+hist(reduced_df$FSTNoCorr[reduced_df$He>0.1],xlim=c(0,0.3), breaks=50)
+dev.off()
+
+print("third plot finished")
+```
