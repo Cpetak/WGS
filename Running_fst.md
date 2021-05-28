@@ -69,7 +69,21 @@ done
 
 ```
 ## using OutFlank to get per-site Fst
-Make a separate R script for each partial vcf to analyse
+
+Fist, fix all topped partial files such as
+```
+#!/bin/bash
+pfiles=$(ls | grep "topped")
+
+ for i in $pfiles
+ do
+    echo $i
+    sed -i 's/NA/NA\/NA/g' $i
+ done
+```
+because outflank expects NA/NA instead of just NA
+
+Then, make a separate R script for each partial vcf to analyse, in partial_vcfs, which uses outflank to calculate Fst for each site
 ```
 #!/bin/sh
 pfiles=$(ls | grep "topped")
@@ -97,3 +111,24 @@ do
 	echo -e "write.csv(FstDataFrame, file = \"${i}data.csv\")" >> $script_name
 done
 ```
+-> example output: topped_xdk.vcfscript.R
+```
+ls | grep "vcfscript" > scripts.txt
+
+```
+
+Next, launch each R script as a separate job, the input to the following code is scripts.txt
+
+```
+#!/bin/sh
+while read line ; do
+        FILE=$(mktemp)
+        cat header.txt >> $FILE
+        echo "Rscript $line" >> $FILE
+        sbatch $FILE
+        sleep 0.5
+        rm $FILE
+done < $1
+
+```
+-> example output
