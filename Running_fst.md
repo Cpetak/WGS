@@ -1,6 +1,7 @@
 # Running Fst
 
-### Make vcf using ANGSD
+## Make vcf file
+### Make bcf using ANGSD
 ```
 
 ref="/users/c/p/cpetak/WGS/reference_genome/GCF_000002235.5_Spur_5.0_genomic.fna"
