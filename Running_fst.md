@@ -36,10 +36,24 @@ ref="/users/c/p/cpetak/WGS/reference_genome/GCF_000002235.5_Spur_5.0_genomic.fna
 bcftools view all_pop_angsd.bcf > all_pop_angsd.vcf
 ```
 
-### adding GT and removing other information from vcf file
+### adding GT and preparing for OutFlank
+Adding GT:
 ```
 vcfglxgt all_pop_angsd.vcf > fixed_all_pop_angsd.vcf
-bcftools annotate -x FORMAT fixed_all_pop_angsd.vcf > fixed_all_pop_angsd_onlyGT.vcf
+```
+If all values in vcf (GT:GP:PL:GL:DP) are 0 -> due to missing data, replace with NA
+```
+sed -i 's/0\/0\:0\,0\,0\:0\,0\,0\:0\,0\,0\:0/NA\:0\,0\,0\:0\,0\,0\:0\,0\,0\:0/g' fixed_all_pop_angsd_copy.vcf
+```
+Keep only GT information
+```
+awk -v FS="\t" -v OFS="\t" '{for(i=9;i<=NF;i++) {split($i, gt, ":"); $i=gt[1]} print}' fixed_all_pop_angsd_copy.vcf > fixed_all_pop_angsd_copy_onlyGT.vcf
+```
+```
+head -916 fixed_all_pop_angsd_copy_onlyGT.vcf > vcf_head.vcf
+cat fixed_all_pop_angsd_copy_onlyGT.vcf | grep -v "#" > vcf_tail.vcf
+split -l 100000 vcf_tail.vcf
+
 ```
 ### using OutFlank to get per-site Fst
 
