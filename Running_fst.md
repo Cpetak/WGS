@@ -144,7 +144,7 @@ cut -f 2-10 -d , combined.csv | nl -w 1 -p -s , > fixed_combined.csv #reindexing
 vim fixed_combined.csv -> insert as first line: "","LocusName","He","FST","T1","T2","FSTNoCorr","T1NoCorr","T2NoCorr","meanAlleleFreq" 
 ```
 ## using OutFlank to plot Fst distribution
-Inside new_results/partial_vcfs/csvs
+Inside new_results/partial_vcfs/csvs/results
 
 ```
 library(OutFLANK)
