@@ -145,8 +145,9 @@ vim fixed_combined.csv -> insert as first line: "","LocusName","He","FST","T1","
 awk -F, '$3 > 0.1' fixed_combined.csv > fixed_combined_goodhe.csv #getting only sites with He > 0.1
 cat fixed_combined_goodhe.csv | cut -d ',' -f2,7 > twocol.csv #keeping only position and FSTNoCorr columns
 sort -k 2 -t , -n -r twocol.csv > sorted_twocol.csv #sort by Fst
+head -6823 sorted_twocol.csv > reduced_sorted_twocol.csv #keep only pos with Fst > 0.1
 ```
-sorted_twocol.csv is the input to this python notebook -> https://colab.research.google.com/drive/1KBItMrL52mDsmvZ_2efnrm9F-XaXS459?usp=sharing
+reduced_sorted_twocol.csv is the input to this python notebook -> https://colab.research.google.com/drive/1KBItMrL52mDsmvZ_2efnrm9F-XaXS459?usp=sharing
 output: list of genes or genes in which high Fst SNPs fall
 
 ## using OutFlank to plot Fst distribution
