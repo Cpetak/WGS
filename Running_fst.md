@@ -147,6 +147,7 @@ cat fixed_combined_goodhe.csv | cut -d ',' -f2,7 > twocol.csv #keeping only posi
 sort -k 2 -t , -n -r twocol.csv > sorted_twocol.csv #sort by Fst
 head -6823 sorted_twocol.csv > reduced_sorted_twocol.csv #keep only pos with Fst > 0.1, vim remove first few lines that were incorrectly sorted due to eg e-10
 ```
+(note to self: number of outliers slightly different from before, whereas old fixed_combined and new are the same -> must have been an error during processing, now it is correct)
 reduced_sorted_twocol.csv is the input to this python notebook -> https://colab.research.google.com/drive/1KBItMrL52mDsmvZ_2efnrm9F-XaXS459?usp=sharing
 output: list of genes or genes in which high Fst SNPs fall
 
