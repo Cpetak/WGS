@@ -142,7 +142,13 @@ for i in $(ls); do sed '1d' $i > ${i}_fixed; done
 cat *csv_fixed > combined.csv
 cut -f 2-10 -d , combined.csv | nl -w 1 -p -s , > fixed_combined.csv #reindexing csv
 vim fixed_combined.csv -> insert as first line: "","LocusName","He","FST","T1","T2","FSTNoCorr","T1NoCorr","T2NoCorr","meanAlleleFreq" 
+awk -F, '$3 > 0.1' fixed_combined.csv > fixed_combined_goodhe.csv #getting only sites with He > 0.1
+cat fixed_combined_goodhe.csv | cut -d ',' -f2,7 > twocol.csv #keeping only position and FSTNoCorr columns
+sort -k 2 -t , -n -r twocol.csv > sorted_twocol.csv #sort by Fst
 ```
+sorted_twocol.csv is the input to this python notebook -> https://colab.research.google.com/drive/1KBItMrL52mDsmvZ_2efnrm9F-XaXS459?usp=sharing
+output: list of genes or genes in which high Fst SNPs fall
+
 ## using OutFlank to plot Fst distribution
 Inside new_results/partial_vcfs/csvs/results
 
