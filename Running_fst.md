@@ -112,7 +112,7 @@ do
 done
 ```
 -> example output: topped_xaa.vcfscript.R
-Pop.txt is a text file where each line contains the population number, here it is just 20 1s, 20 2s, etc.
+Pop.txt is a text file where the first line is the word "pop", then each line contains the population number, here it is just 20 1s, 20 2s, etc.
 ```
 ls | grep "vcfscript" > scripts.txt
 
